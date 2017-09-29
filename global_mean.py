@@ -43,6 +43,20 @@ gissclimshift = giss_ts.calculate_average(1981,2010)-giss_ts.calculate_average(1
 print hadclimshift,ncdcclimshift,gissclimshift
 print (hadclimshift+ncdcclimshift+gissclimshift)/3.
 
+print "Difference in baseline 1981-2010 minus 1880-1900"
+hadclimshift= had_ts.calculate_average(1981,2010)-had_ts.calculate_average(1880,1900)
+ncdcclimshift = ncdc_ts.calculate_average(1981,2010)-ncdc_ts.calculate_average(1880,1900)
+gissclimshift = giss_ts.calculate_average(1981,2010)-giss_ts.calculate_average(1880,1900)
+print hadclimshift,ncdcclimshift,gissclimshift
+print (hadclimshift+ncdcclimshift+gissclimshift)/3.
+
+print "Difference in baseline 1986-2005 minus 1981-2010"
+hadclimshift= had_ts.calculate_average(1986,2005)-had_ts.calculate_average(1981,2010)
+ncdcclimshift = ncdc_ts.calculate_average(1986,2005)-ncdc_ts.calculate_average(1981,2010)
+gissclimshift = giss_ts.calculate_average(1986,2005)-giss_ts.calculate_average(1981,2010)
+print hadclimshift,ncdcclimshift,gissclimshift
+print (hadclimshift+ncdcclimshift+gissclimshift)/3.
+
 pre_had  = had_ts.calculate_average(1880,1900)
 pre_ncdc = ncdc_ts.calculate_average(1880,1900)
 pre_giss = giss_ts.calculate_average(1880,1900)

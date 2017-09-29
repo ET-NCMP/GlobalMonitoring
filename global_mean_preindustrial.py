@@ -88,11 +88,11 @@ had_ts.print_ordered_ts(5)
 ncdc_ts.print_ordered_ts(5)
 giss_ts.print_ordered_ts(5)
 
-av = (had_ts.get_value(2017) +
-      jra_ts.get_value(2017) +
-      era_ts.get_value(2017) +
-      ncdc_ts.get_value(2017) +
-      giss_ts.get_value(2017))/5.
+av = np.mean([had_ts.get_value(2017),
+              jra_ts.get_value(2017),
+              era_ts.get_value(2017),
+              ncdc_ts.get_value(2017),
+              giss_ts.get_value(2017)])
 
 print np.std([had_ts.get_value(2017),
               jra_ts.get_value(2017),
