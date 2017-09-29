@@ -6,6 +6,9 @@ for country in ["africa","asia","europe","northAmerica","oceania","southAmerica"
     ts = rd.read_noaa_continents(country)
     ts.rebaseline(1981,2010)
 
+    ts.print_ts()
+    ts.print_ordered_ts(10)
+
     ts.plot_ts('red')
     plt.show()
 

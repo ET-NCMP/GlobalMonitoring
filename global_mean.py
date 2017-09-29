@@ -1,324 +1,120 @@
 import numpy as np
-#import matplotlib
-#matplotlib.use('PS')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from time_series import *
 from read_data_sets import *
 
-def combine_series(series1, series2, series3):
-    #average together three annual time series and return an annual time series
-    #hardcoded to do this from 1880 to 2014. It takes the uncertainty estimates
-    #from the first of the three series.
-    comb_year = []
-    comb_anom = []
-    comb_upper_unc = []
-    comb_lower_unc = []
 
-    for year in range(1880,2016):
-            
-        ind1 = series1.times.index(year)
-        ind2 = series2.times.index(year)
-        ind3 = series3.times.index(year)
-
-        av = np.mean([series1.data[ind1], series2.data[ind2], series3.data[ind3] ])
-
-        comb_year.append(year)
-        comb_anom.append(av)
-        comb_upper_unc.append(av+series1.hiunc[ind1]-series1.data[ind1])
-        comb_lower_unc.append(av+series1.lounc[ind1]-series1.data[ind1])
-
-        combined = time_series(comb_year,
-                               comb_anom,
-                               comb_lower_unc,
-                               comb_upper_unc)
-
-
-    return combined
-
-
-
-
-###########################
-###########################
-###########################
-###########################
-##
-##      MAIN STRIP
-##
-###########################
-###########################
-###########################
-###########################
-
-
-ncdc_version = "v4.0.0.201512"
-hadsst_version = "3.1.1.0"
-crutem_version = "4.4.0.0"
-hadcrut_version = "4.4.0.0"
-cowtan_and_way_version = "v2_0_0"
+noaa_version = "v4.0.1.201708"
+hadcrut_version = "4.5.0.0"
 
 
 print("GLOBAL AVERAGE TEMPERATURES")
 
-#berk_monthly = read_berk()
-#berk_monthly.rebaseline(1961,1990)
-#berk_ts = berk_monthly.annualise()
-#berk_ts.add_name("Berkeley")
+jra_monthly = read_jra55()
+jra_monthly.rebaseline(1981,2010)
+jra_ts = jra_monthly.annualise()
+jra_ts.add_name("JRA-55")
 
-#jra_monthly = read_jra55()
-#jra_monthly.rebaseline(1981,2010)
-#jra_ts = jra_monthly.annualise()
-#jra_ts.add_name("JRA 55")
 
-#era_monthly = read_era_interim()
-#era_ts = era_monthly.annualise()
-#era_ts.add_name("ERA-interim")
-#era_ts.add_offset(0.3)
-
-cwh_ts = read_cowtan_and_way_hybrid_monthly(cowtan_and_way_version)
-cwh_ts = cwh_ts.annualise()
-cwh_ts.add_name("Cowtan and Way Hybrid")
-cwh_ts.add_offset(0.3)
-
-cw_ts = read_cowtan_and_way_monthly(cowtan_and_way_version)
-cw_ts = cw_ts.annualise()
-cw_ts.add_name("Cowtan and Way")
+era_monthly = read_era_interim()
+era_monthly.rebaseline(1981,2010)
+era_ts = era_monthly.annualise()
+era_ts.add_name("ERA-interim")
 
 had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
-print had_ts.calculate_average(1850,1900)
+had_ts.rebaseline(1981,2010)
 
-#ncdc_monthly = read_alt_ncdc_monthly()
-#ncdc_ts = ncdc_monthly.annualise()
-ncdc_ts = read_ncdc(ncdc_version)
-ncdc_ts.rebaseline(1961,1990)
-ncdc_ts.add_name("MLOST")
-
-giss_ts = read_giss()
-giss_ts.rebaseline(1961,1990)
-giss_ts.add_name("GISTEMP")
-
-#combine HadCRUT, NCDC and GISS to get the WMO combined series
-#which uses HadCRUT uncertainty estimates
-combined_ts = combine_series(had_ts, ncdc_ts, giss_ts)
-combined_ts.add_name("Combined")
-
-print combined_ts.calculate_average(1981,2010)
-
-combined_ts.print_ts()
-combined_ts.rebaseline(1981,2010)
-combined_ts.print_ts()
-
-
-assert False
-
-combined_ts.print_to_file('Data/COMBINED_TS_WMO.csv')
-had_ts.print_to_file('Data/HadCRUT_TS_WMO.csv')
-ncdc_ts.print_to_file_nounc('Data/NOAAGlobalTemp_TS_WMO.csv')
-giss_ts.print_to_file_nounc('Data/GISTEMP_TS_WMO.csv')
-
-#combined_ts.print_running_mean(5)
-combined_ts.print_ts()
-
-combined_ts.plot_running_mean([5])
-combined_ts.plot_running_mean([10])
-
-print combined_ts.calculate_average(1880,1899)
-
-#assert False
-
-#plot the global temperatures with the non-linear trend
-#estimate provided by Prof David Stephenson of the University
-#of Exeter, as used in the IPCC report
-#combined_trend_ts = read_stephenson_trends()
-#combined_ts.plot_ts('Black')
-#combined_trend_ts.plot_ts_with_unc('Red','Pink')
-#plt.xlabel('Year', fontsize=18)
-#plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
-#plt.axis((1875,2016,-0.6,0.77))
-#plt.xticks(range(1880,2020,20), fontsize = 16)
-#plt.yticks(np.arange(-0.6,0.8,0.2), fontsize = 16)
-#plt.text(1900,0.0,"DRAFT",fontsize=100,color="AliceBlue",alpha=0.5)
-#plt.text(1940,-0.58,"Analysis provided by Prof. David Stephenson, University of Exeter",fontsize=10)
-#plt.show()
-
-#print out the whole of the combined time series
-combined_ts.print_ts()
-
-#plot variety of different views
-combined_ts.modded_skyscraper_diagram()
-combined_ts.plot_ranking_diagram_mono(7,1)
-
-#ninos = read_oni_nino_categories()
-ninos = oni_ono()
-combined_ts.plot_skyscraper_diagram(ninos)
-combined_ts.plot_ts_highlight_nino(ninos)
-
-#make diagram showing all three data sets
-had_ts.plot_ts_with_unc('Black','Silver')
-giss_ts.plot_ts('orange')
-ncdc_ts.plot_ts('skyblue')
-#cw_ts.plot_ts('Green')
-#cwh_ts.plot_ts('Pink')
-#era_ts.plot_ts('Gold')
-plt.xlabel('Year', fontsize=18)
-plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
-plt.legend(loc='best')
-plt.xticks(range(1860,2020,20), fontsize = 16)
-plt.yticks(np.arange(-0.8,1.0,0.2), fontsize = 16)
-#plt.savefig('gmt.png', bbox_inches='tight')
-plt.show()
-
-#era_ts.plot_ts('Black')
-#jra_ts.plot_ts('Red')
-#plt.xlabel('Year', fontsize=18)
-#plt.ylabel('Anomaly relative to 1981-2010 (K)', fontsize=18)
-#plt.legend(loc='best')
-#plt.xticks(range(1970,2020,10), fontsize = 16)
-#plt.yticks(np.arange(-0.8,0.8,0.2), fontsize = 16)
-#plt.savefig('gmt.png', bbox_inches='tight')
-#plt.show()
-
-#print the running mean of the combined time series
-print("Running mean")
-combined_ts.print_running_mean(10)
-
-#print the 5 warmest years in the combined and other data sets
-combined_ts.print_ordered_ts(5)
-
-#berk_ts.print_ordered_ts(5)
-#jra_ts.print_ordered_ts(5)
-#era_ts.print_ordered_ts(5)
-had_ts.print_ordered_ts(5)
-ncdc_ts.print_ordered_ts(5)
-giss_ts.print_ordered_ts(5)
-cw_ts.print_ordered_ts(5)
-cwh_ts.print_ordered_ts(5)
-
-
-print("")
-print("Global average SST")
-
-#ncdc_sst_monthly = read_alt_ncdc_sst_monthly()
-#ncdc_sst_ts = ncdc_sst_monthly.annualise()
-ncdc_sst_ts = read_ncdc_sst(ncdc_version)
-ncdc_sst_ts.rebaseline(1961,1990)
-ncdc_sst_ts.add_name("ERSST v4")
-ncdc_sst_ts.print_ordered_ts(5)
-
-
-hadsst_ts = read_hadsst3(hadsst_version)
-hadsst_ts.add_name("HadSST."+hadsst_version)
-hadsst_ts.print_ordered_ts(5)
-
-
-hadsst_ts.plot_ts_with_unc('Black','AliceBlue')
-ncdc_sst_ts.plot_ts_with_unc('DeepSkyBlue','Yellow')
-plt.xlabel('Year', fontsize=18)
-plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
-plt.legend(loc='best')
-plt.show()
-
-
-print("")
-print("Global average LSAT")
-
-#ncdc_lsat_monthly = read_alt_ncdc_lsat_monthly()
-#ncdc_lsat_ts = ncdc_lsat_monthly.annualise()
-ncdc_lsat_ts = read_ncdc_lsat(ncdc_version)
-ncdc_lsat_ts.rebaseline(1961,1990)
-ncdc_lsat_ts.add_name("NCDC LSAT")
-ncdc_lsat_ts.print_ordered_ts(10)
-
-print("")
-
-crutem4_ts = read_crutem4(crutem_version)
-crutem4_ts.add_name("CRUTEM."+crutem_version)
-crutem4_ts.print_ordered_ts(10)
-
-
-crutem4_ts.plot_ts_with_unc('Black','AliceBlue')
-ncdc_lsat_ts.plot_ts_with_unc('DeepSkyBlue','Yellow')
-plt.xlabel('Year', fontsize=18)
-plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
-plt.legend(loc='best')
-plt.show()
-
-
-print("")
-print("Year to date comparisons")
-
-cw_monthly = read_cowtan_and_way_monthly(cowtan_and_way_version)
-cw_ts = cw_monthly.annualise(9)
-cw_ts.add_name("Cowtan and Way")
-
-#era_monthly = read_era_interim()
-#era_ts = era_monthly.annualise(10)
-#era_ts.add_name("ERA")
-
-#jra_monthly = read_jra55()
-#jra_monthly.rebaseline(1981,2010)
-#jra_ts = jra_monthly.annualise(10)
-#jra_ts.add_name("JRA")
-
-#berk_monthly = read_berk()
-#berk_monthly.rebaseline(1961,1990)
-#berk_ts = berk_monthly.annualise(9)
-#berk_ts.add_name("Berkeley")
-
-had_monthly = read_hadcrut4_monthly(hadcrut_version)
-had_monthly.rebaseline(1880,1900)
-had_ts = had_monthly.annualise(12)
-had_ts.add_name("HadCRUT")
-
-ncdc_monthly = read_ncdc_monthly(ncdc_version)
-#ncdc_monthly = read_alt_ncdc_monthly()
-ncdc_monthly.rebaseline(1880,1900)
-ncdc_ts = ncdc_monthly.annualise(12)
-ncdc_ts.add_name("NCDC")
+ncdc_monthly = read_ncdc_monthly(noaa_version)
+ncdc_monthly.rebaseline(1981,2010)
+ncdc_ts = ncdc_monthly.annualise()
+ncdc_ts.add_name("NOAAGlobalTemp")
 
 giss_monthly = read_giss_monthly()
-giss_monthly.rebaseline(1880,1900)
-giss_ts = giss_monthly.annualise(12)
+giss_monthly.rebaseline(1981,2010)
+giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
 
-combined_ts = combine_series(had_ts, ncdc_ts, giss_ts)
-combined_ts.add_name("Combined")
+print "Difference in baseline 1981-2010 minus 1961-1990"
+hadclimshift= had_ts.calculate_average(1981,2010)-had_ts.calculate_average(1961,1990)
+ncdcclimshift = ncdc_ts.calculate_average(1981,2010)-ncdc_ts.calculate_average(1961,1990)
+gissclimshift = giss_ts.calculate_average(1981,2010)-giss_ts.calculate_average(1961,1990)
+print hadclimshift,ncdcclimshift,gissclimshift
+print (hadclimshift+ncdcclimshift+gissclimshift)/3.
 
-#berk_ts.print_ordered_ts(5)
-cw_ts.print_ordered_ts(5)
-#jra_ts.print_ordered_ts(5)
-#era_ts.print_ordered_ts(5)
+pre_had  = had_ts.calculate_average(1880,1900)
+pre_ncdc = ncdc_ts.calculate_average(1880,1900)
+pre_giss = giss_ts.calculate_average(1880,1900)
+
+preindus_mid  = 1.0 + (pre_giss+pre_had+pre_ncdc)/3.0
+preindus_low  = preindus_mid - 0.1
+preindus_high = preindus_mid + 0.1
+
+hfont = {'fontname':'Arial'}
+
+plt.figure(figsize=(16,9))
+
+plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
+                 facecolor="Powderblue",color="Powderblue", alpha=0.15,
+                label='1 sigma range')
+plt.plot([1781,1859],[preindus_mid, preindus_mid],color="Powderblue")
+plt.plot([1904,2023],[preindus_mid, preindus_mid],color="Powderblue")
+plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
+plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
+
+jra_ts.plot_ts('mediumorchid')
+era_ts.plot_ts('forestgreen')
+had_ts.plot_ts_with_unc('indianred','mistyrose')
+giss_ts.plot_ts('darkorange')
+ncdc_ts.plot_ts('steelblue')
+
+fsz = 18
+
+plt.text(1861, 0.348, '~1$^\circ$C above pre-industrial', fontdict=hfont, fontsize=fsz, color="powderblue")
+
+
+plt.xlabel('Year', fontsize=fsz, **hfont)
+plt.ylabel('Anomaly relative to 1981-2010 ($^\circ$C)', fontsize=fsz, **hfont)
+
+#plt.legend(loc='lower right', frameon=False)
+plt.legend(bbox_to_anchor=(0.89, 0.32),
+           bbox_transform=plt.gcf().transFigure, 
+           frameon=False)
+
+plt.xticks(range(1860,2040,20), fontsize = fsz, **hfont)
+plt.yticks(np.arange(-1.2,1.0,0.2), fontsize = fsz, **hfont)
+plt.axis((1845,2022.5,-1.1,0.7))
+
+ax1 = plt.axes()
+ax1.set_frame_on(False)
+ax1.yaxis.set_ticks_position('left')
+ax1.xaxis.set_ticks_position('bottom')
+
+plt.title('Global temperature anomaly 1850-2017', loc='left', fontsize = fsz+10, **hfont)
+
+plt.savefig('Figures/gmt.png', bbox_inches='tight')
+#plt.show()
+
+jra_ts.print_ordered_ts(5)
+era_ts.print_ordered_ts(5)
 had_ts.print_ordered_ts(5)
 ncdc_ts.print_ordered_ts(5)
 giss_ts.print_ordered_ts(5)
-combined_ts.print_ordered_ts(5)
 
-had_monthly = read_hadcrut4_monthly(hadcrut_version)
-had_ts = had_monthly.annualise(12)
-had_ts.add_name("HadCRUT")
+av = (had_ts.get_value(2017) +
+      jra_ts.get_value(2017) +
+      era_ts.get_value(2017) +
+      ncdc_ts.get_value(2017) +
+      giss_ts.get_value(2017))/5.
 
-ncdc_monthly = read_ncdc_monthly(ncdc_version)
-#ncdc_monthly = read_alt_ncdc_monthly()
-ncdc_monthly.rebaseline(1961,1990)
-ncdc_ts = ncdc_monthly.annualise(12)
-ncdc_ts.add_name("NCDC")
 
-giss_monthly = read_giss_monthly()
-giss_monthly.rebaseline(1961,1990)
-giss_ts = giss_monthly.annualise(12)
-giss_ts.add_name("GISTEMP")
+print "Average of global mean series for 2017 and 95% range"
+print av
+print np.std([had_ts.get_value(2017),
+              jra_ts.get_value(2017),
+              era_ts.get_value(2017),
+              ncdc_ts.get_value(2017),
+              giss_ts.get_value(2017)]) * 1.96
 
-combined_ts = combine_series(had_ts, ncdc_ts, giss_ts)
-combined_ts.rebaseline(1880,1900)
-combined_ts.add_name("Combined")
 
-#berk_ts.print_ordered_ts(5)
-cw_ts.print_ordered_ts(5)
-#jra_ts.print_ordered_ts(5)
-#era_ts.print_ordered_ts(5)
-had_ts.print_ordered_ts(5)
-ncdc_ts.print_ordered_ts(5)
-giss_ts.print_ordered_ts(5)
-combined_ts.print_ordered_ts(5)

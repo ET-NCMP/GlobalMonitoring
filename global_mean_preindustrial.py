@@ -77,7 +77,7 @@ ax1.set_frame_on(False)
 ax1.yaxis.set_ticks_position('left')
 ax1.xaxis.set_ticks_position('bottom')
 
-plt.title('Global mean temperature 1850-2017', loc='left', fontsize = fsz+10, **hfont)
+plt.title('Global temperature 1850-2017', loc='left', fontsize = fsz+10, **hfont)
 
 plt.savefig('Figures/gmt_pre.png', bbox_inches='tight')
 #plt.show()
@@ -88,3 +88,15 @@ had_ts.print_ordered_ts(5)
 ncdc_ts.print_ordered_ts(5)
 giss_ts.print_ordered_ts(5)
 
+av = (had_ts.get_value(2017) +
+      jra_ts.get_value(2017) +
+      era_ts.get_value(2017) +
+      ncdc_ts.get_value(2017) +
+      giss_ts.get_value(2017))/5.
+
+print np.std([had_ts.get_value(2017),
+              jra_ts.get_value(2017),
+              era_ts.get_value(2017),
+              ncdc_ts.get_value(2017),
+              giss_ts.get_value(2017)]) * 1.96
+print av
