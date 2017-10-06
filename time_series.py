@@ -360,6 +360,17 @@ class time_series:
         print "Long Term Averages"
         print ("%4i-%4i avg = %7.3f" % (year1,year2,np.mean(self.data[index1:index2+1])))
 
+    def plot_running_line(self,filter_width,color):
+        
+        running_mean = []
+        running_axis = []
+
+        for i in range(filter_width,len(self.data)):
+            running_mean.append(np.mean(self.data[i-filter_width:i]))
+            running_axis.append(np.mean(self.times[i-filter_width:i]))
+
+        plt.plot(running_axis,running_mean, linewidth=1.5, color=color, label=self.name)
+        
 
     def plot_running_mean(self,filter_width):
 

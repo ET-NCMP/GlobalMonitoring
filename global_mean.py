@@ -6,7 +6,7 @@ from read_data_sets import *
 
 
 noaa_version = "v4.0.1.201708"
-hadcrut_version = "4.5.0.0"
+hadcrut_version = "4.6.0.0"
 
 
 print("GLOBAL AVERAGE TEMPERATURES")
