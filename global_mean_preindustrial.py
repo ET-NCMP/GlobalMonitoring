@@ -77,7 +77,7 @@ ax1.set_frame_on(False)
 ax1.yaxis.set_ticks_position('left')
 ax1.xaxis.set_ticks_position('bottom')
 
-plt.title('Global temperature 1850-2017', loc='left', fontsize = fsz+10, **hfont)
+plt.title('Global temperature anomaly 1850-2017 relative to pre-industrial', loc='left', fontsize = fsz+10, **hfont)
 
 plt.savefig('Figures/gmt_pre.png', bbox_inches='tight')
 #plt.show()
