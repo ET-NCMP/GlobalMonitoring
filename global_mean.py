@@ -69,17 +69,17 @@ hfont = {'fontname':'Arial'}
 
 plt.figure(figsize=(16,9))
 
-plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
-                 facecolor="Powderblue",color="Powderblue", alpha=0.15,
-                label='1 sigma range')
+#plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
+#                 facecolor="Powderblue",color="Powderblue", alpha=0.15,
+#                label='1 sigma range')
 plt.plot([1781,1859],[preindus_mid, preindus_mid],color="Powderblue")
 plt.plot([1904,2023],[preindus_mid, preindus_mid],color="Powderblue")
-plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
-plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
+#plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
+#plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
 
 jra_ts.plot_ts('mediumorchid')
 era_ts.plot_ts('forestgreen')
-had_ts.plot_ts_with_unc('indianred','mistyrose')
+had_ts.plot_ts('indianred')
 giss_ts.plot_ts('darkorange')
 ncdc_ts.plot_ts('steelblue')
 
@@ -105,7 +105,7 @@ ax1.set_frame_on(False)
 ax1.yaxis.set_ticks_position('left')
 ax1.xaxis.set_ticks_position('bottom')
 
-plt.title('Global temperature anomaly 1850-2017', loc='left', fontsize = fsz+10, **hfont)
+plt.title('Global temperature anomaly 1850-2017 relative to 1981-2010', loc='left', fontsize = fsz+10, **hfont)
 
 plt.savefig('Figures/gmt.png', bbox_inches='tight')
 #plt.show()

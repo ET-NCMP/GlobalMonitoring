@@ -44,25 +44,28 @@ preindus_mid  = 1.0 + (pre_giss+pre_had+pre_ncdc)/3.0
 preindus_low  = preindus_mid - 0.1
 preindus_high = preindus_mid + 0.1
 
-for w in [5,10]:
+for w in [5, 10]:
     hfont = {'fontname':'Arial'}
 
     plt.figure(figsize=(16,9))
 
-    plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
-                     facecolor="Powderblue",color="Powderblue", alpha=0.15,
-                     label='1 sigma range')
+#    plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
+#                     facecolor="Powderblue",color="Powderblue", alpha=0.15,
+#                     label='1 sigma range')
     plt.plot([1781,1859],[preindus_mid, preindus_mid],color="Powderblue")
     plt.plot([1904,2023],[preindus_mid, preindus_mid],color="Powderblue")
-    plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
-    plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
+#    plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
+#    plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
     
-    jra_ts.plot_running_line(w,'mediumorchid')
-    era_ts.plot_running_line(w,'forestgreen')
-    had_ts.plot_running_line(w,'indianred')
-    giss_ts.plot_running_line(w,'darkorange')
-    ncdc_ts.plot_running_line(w,'steelblue')
-    
+    jra5, jrax = jra_ts.plot_running_line(w,'mediumorchid')
+    era5, erax = era_ts.plot_running_line(w,'forestgreen')
+    had5, hadax = had_ts.plot_running_line(w,'indianred')
+    gis5, gisax = giss_ts.plot_running_line(w,'darkorange')
+    ncd5, ncdax = ncdc_ts.plot_running_line(w,'steelblue')
+
+    print (w,jra5[-1],era5[-1],had5[-1],gis5[-1],ncd5[-1],
+           np.mean([jra5[-1],era5[-1],had5[-1],gis5[-1],ncd5[-1]]))
+
     fsz = 18
     
     plt.text(1861, 0.348, '~1$^\circ$C above pre-industrial', fontdict=hfont, fontsize=fsz, color="powderblue")

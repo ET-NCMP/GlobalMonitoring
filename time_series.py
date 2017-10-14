@@ -255,6 +255,30 @@ class time_series:
         self.hiunc = hiunc
         self.name = ""
    
+    def combine(self,others):
+        data = []
+        data1 = []
+        data2 = []
+        times = []
+
+        for i, t in enumerate(self.times):
+            hold = [self.data[i]]
+            for ts in others:
+                try:
+                    g = ts.get_value(t)
+                except:
+                    g = None
+
+                if g != None:
+                    hold.append(g)
+
+            data.append(np.mean(hold))
+            data1.append(max(hold))
+            data2.append(min(hold))
+            times.append(t)
+            
+        return time_series(times,data,data1,data2)
+
     def print_to_file(self,filename):
 
         file = open(filename,'w')
@@ -366,11 +390,14 @@ class time_series:
         running_axis = []
 
         for i in range(filter_width,len(self.data)):
-            running_mean.append(np.mean(self.data[i-filter_width:i]))
-            running_axis.append(np.mean(self.times[i-filter_width:i]))
-
+            running_mean.append(np.mean(self.data[i-filter_width+1:i+1]))
+            running_axis.append(np.mean(self.times[i-filter_width+1:i+1]))
+#            print (self.times[i-filter_width+1:i+1],
+#                   np.mean(self.data[i-filter_width+1:i+1]),
+#                   np.mean(self.times[i-filter_width+1:i+1]))
         plt.plot(running_axis,running_mean, linewidth=1.5, color=color, label=self.name)
         
+        return running_mean,running_axis
 
     def plot_running_mean(self,filter_width):
 
@@ -431,3 +458,71 @@ class time_series:
 
         plt.axis((1848,2016,mn-delta,mx+delta))
 
+    def plot_skyscraper_diagram(self):
+
+        hfont = {'fontname':'Arial'}
+        fsz = 18
+        plt.figure(figsize=(16,9))
+        
+        plt.plot(np.zeros(50), color="White")
+#        for i in range(1960,2020,10):
+#            plt.plot([i,i],[-10,10],color="DarkGray",zorder=1)
+
+        for i in range(0,len(self.times)):
+
+            y = self.times[i]
+            d = self.data[i]
+
+            color = "Beige"
+
+            if nino_year(y) == 0:
+                color = "Silver"
+            elif nino_year(y) == -1:
+                color = "DodgerBlue"
+            elif nino_year(y) == 1:
+                color = "darkred"
+
+            if y == 2015:
+                color = "indianred"
+
+            delta = 0.45
+           
+            poly = Polygon(zip([y-delta,y+delta,y+delta,y-delta],\
+                               [0,0,d,d]),facecolor=color,edgecolor="Black",zorder=2)
+            plt.gca().add_patch(poly)
+
+        plt.xlabel('Year', fontdict=hfont, fontsize=fsz)
+        plt.ylabel('Anomaly relative to 1981-2010 ($^\circ$C)', fontdict=hfont, fontsize=fsz)
+
+#draw off-screen polygons to get an appropriate legend
+        poly = Polygon(zip([0,0,0,0],[0,0,0,0]),facecolor='FireBrick',edgecolor="Black",label="El Nino")
+        plt.gca().add_patch(poly)
+        poly = Polygon(zip([0,0,0,0],[0,0,0,0]),facecolor='Silver',edgecolor="Black",label="Neutral")
+        plt.gca().add_patch(poly)
+        poly = Polygon(zip([0,0,0,0],[0,0,0,0]),facecolor='DodgerBlue',edgecolor="Black",label="La Nina")
+        plt.gca().add_patch(poly)
+
+        plt.legend(bbox_to_anchor=(0.24, 0.892),
+                   bbox_transform=plt.gcf().transFigure, 
+                   frameon=False)
+
+        plt.plot([1949.5,2018.5],[0,0],color="Black")
+        plt.axis((1949.5,2018.5,-0.72,0.72))
+        plt.savefig('Figures/gmt_skyscraper.png', bbox_inches='tight')
+
+
+def nino_year(year):
+    #based on CPC Nino 3.4. Apparently.
+
+    result = 0 #neutral
+
+    elninos = [1958, 1966, 1973, 1983, 1987, 1988, 1998, 2003, 2010, 2015, 2016]
+    laninas = [1950, 1955, 1956, 1974, 1976, 1989, 1999, 2000, 2008, 2011]
+
+    if year in laninas:
+        result = -1
+    elif year in elninos:
+        result = 1
+
+    return result
+ 

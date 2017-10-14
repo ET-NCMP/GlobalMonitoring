@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 import matplotlib.patches as mpatches
 
-noaa_version = "v4.0.1.201707"
+noaa_version = "v4.0.1.201708"
 hadcrut_version = "4.6.0.0"
 
 
@@ -54,7 +54,7 @@ plt.figure(figsize=(16,9))
 
 jra_ts.plot_ts('mediumorchid')
 era_ts.plot_ts('forestgreen')
-had_ts.plot_ts_with_unc('indianred','lightyellow')
+had_ts.plot_ts('indianred')
 giss_ts.plot_ts('darkorange')
 ncdc_ts.plot_ts('steelblue')
 
@@ -100,3 +100,13 @@ print np.std([had_ts.get_value(2017),
               ncdc_ts.get_value(2017),
               giss_ts.get_value(2017)]) * 1.96
 print av
+
+jra5, jrax = jra_ts.plot_running_line(5,'mediumorchid')
+era5, erax = era_ts.plot_running_line(5,'forestgreen')
+had5, hadax = had_ts.plot_running_line(5,'indianred')
+gis5, gisax = giss_ts.plot_running_line(5,'darkorange')
+ncd5, ncdax = ncdc_ts.plot_running_line(5,'steelblue')
+
+print "5 year averages wrt pre-industrial"
+print jra5[-1],era5[-1],had5[-1],gis5[-1],ncd5[-1]
+print np.mean([jra5[-1],era5[-1],had5[-1],gis5[-1],ncd5[-1]])
