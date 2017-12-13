@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 import matplotlib.patches as mpatches
 
-noaa_version = "v4.0.1.201708"
+noaa_version = "v4.0.1.201710"
 hadcrut_version = "4.6.0.0"
 
 
@@ -41,7 +41,7 @@ jra_ts.add_offset(avg_clim)
 era_monthly = read_era_interim()
 era_monthly.rebaseline(1981,2010)
 era_ts = era_monthly.annualise()
-era_ts.add_name("ERA-interim")
+era_ts.add_name("ERA-Interim")
 era_ts.add_offset(avg_clim)
 
 print had_ts.get_value(2015) - had_ts.calculate_average(1880,1900)
@@ -87,6 +87,20 @@ era_ts.print_ordered_ts(5)
 had_ts.print_ordered_ts(5)
 ncdc_ts.print_ordered_ts(5)
 giss_ts.print_ordered_ts(5)
+
+print "Averages for various years"
+for y in range(1998,2018):
+
+    av = (had_ts.get_value(y) +
+          jra_ts.get_value(y) +
+          era_ts.get_value(y) +
+          ncdc_ts.get_value(y) +
+          giss_ts.get_value(y))/5.
+    print y,av, np.std([had_ts.get_value(y),
+                        jra_ts.get_value(y),
+                        era_ts.get_value(y),
+                        ncdc_ts.get_value(y),
+                        giss_ts.get_value(y)]) * 1.96
 
 av = np.mean([had_ts.get_value(2017),
               jra_ts.get_value(2017),

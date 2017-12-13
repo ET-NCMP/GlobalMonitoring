@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 
 
-noaa_version = "v4.0.1.201708"
+noaa_version = "v4.0.1.201710"
 hadcrut_version = "4.6.0.0"
 
 
@@ -19,7 +19,7 @@ jra_ts.add_name("JRA-55")
 era_monthly = read_era_interim()
 era_monthly.rebaseline(1981,2010)
 era_ts = era_monthly.annualise()
-era_ts.add_name("ERA-interim")
+era_ts.add_name("ERA-Interim")
 
 had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
@@ -38,6 +38,8 @@ giss_ts.add_name("GISTEMP")
 combined = had_ts.combine([jra_ts,era_ts,ncdc_ts,giss_ts])
 
 combined.plot_skyscraper_diagram()
+
+combined.print_to_file_nounc('WMO_global_mean.csv')
 
 assert False
 

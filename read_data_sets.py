@@ -46,6 +46,63 @@ def read_sea_level():
 
     return timeax, sealevel
 
+def read_mrlk():
+
+    f = open('/project/earthobs/GLOBAL_SURFACE_TEMPERATURE/MRLK/annavg2decdata.txt','r')
+    f.readline()
+    
+    mrlk_year = []
+    mrlk_anom = []
+    mrlk_upper_unc = []
+    mrlk_lower_unc = []
+
+    year = 1850
+    for line in f:
+        columns = line.split()
+        columns = columns[1:]
+        columns = map(float, columns)
+
+        mrlk_year.append(year)
+        mrlk_anom.append(np.mean(columns))
+        mrlk_upper_unc.append(np.mean(columns)+2*np.std(columns))
+        mrlk_lower_unc.append(np.mean(columns)-2*np.std(columns))
+
+        year += 1
+
+    f.close()
+
+    return time_series(mrlk_year, mrlk_anom, mrlk_upper_unc, mrlk_lower_unc)
+
+
+def read_mrlk_stream(nstream):
+
+    for i in range(nstream):
+        f = open('/project/earthobs/GLOBAL_SURFACE_TEMPERATURE/MRLK/annavg2decdata.txt','r')
+        f.readline()
+        
+        mrlk_year = []
+        mrlk_anom = []
+        mrlk_upper_unc = []
+        mrlk_lower_unc = []
+
+        year = 1850
+        for line in f:
+            columns = line.split()
+            columns = columns[1:]
+            columns = map(float, columns)
+
+            mrlk_year.append(year)
+            mrlk_anom.append(columns[i])
+            mrlk_upper_unc.append(columns[i])
+            mrlk_lower_unc.append(columns[i])
+
+            year += 1
+
+        f.close()
+
+        yield time_series(mrlk_year, mrlk_anom, mrlk_upper_unc, mrlk_lower_unc)
+
+
 def read_berkeley():
 
     f = open('Data/Land_and_Ocean_complete.txt','r')
@@ -121,7 +178,7 @@ def read_psd(filename):
 
     
 def read_jra55():
-    f=open("Data/JRA-55_tmp2m_global_ts.txt",'r')
+    f=open("Data/JRA-55_tmp2m_global_ts_Clim8110.txt",'r')
 
     jra_year = []
     jra_month = []
@@ -141,7 +198,7 @@ def read_jra55():
     
 
 def read_era_interim():
-    f=open("Data/Data_for_month_8_2017_plot_3.txt",'r')
+    f=open("Data/Data_for_month_10_2017_plot_3.txt",'r')
 
     f.readline()
     f.readline()
@@ -154,9 +211,10 @@ def read_era_interim():
 
     for line in f:
         line = line.strip()
+        cols = line.split(',')
         era_year.append(float(line[0:4]))
         era_month.append(float(line[4:6]))
-        era_data.append(float(line[9:16]))
+        era_data.append(float(cols[1]))
 
     f.close()
 
@@ -164,6 +222,9 @@ def read_era_interim():
 
     return era_ts
 
+ 
+def read_hadsst3_monthly(version):
+    return read_hadley_monthly('Data/HadSST.'+version+'_monthly_globe_ts.txt')
  
 def read_hadcrut4_monthly(version):
     return read_hadley_monthly('Data/HadCRUT.'+version+'.monthly_ns_avg.txt')
@@ -275,7 +336,7 @@ def read_hadley_bias(filename):
 
 
 def read_hadcrut4(version):
-    return read_hadley('Data/HadCRUT.'+version+'.annual_ns_avg.txt')
+    return read_hadley('Data/HadCRUT.'+version+'.annual_ns_avg.1981-2010.txt')
 
 
 def read_ncei_binary(filename,timepoints,y1):
@@ -333,6 +394,9 @@ def read_ncdc_format_monthly(filename):
     return ncdc_ts
     
 def read_ncdc_monthly(version):
+    return read_ncdc_format_monthly('Data/aravg.mon.land_ocean.90S.90N.'+version+'.asc')
+
+def read_ncdc_ocean_monthly(version):
     return read_ncdc_format_monthly('Data/aravg.mon.land_ocean.90S.90N.'+version+'.asc')
 
 

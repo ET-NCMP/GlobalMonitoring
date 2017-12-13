@@ -5,9 +5,11 @@ from time_series import *
 from read_data_sets import *
 
 
-noaa_version = "v4.0.1.201708"
+noaa_version = "v4.0.1.201710"
 hadcrut_version = "4.6.0.0"
+cw_version = "v2_0_0"
 
+plotpre = False
 
 print("GLOBAL AVERAGE TEMPERATURES")
 
@@ -20,7 +22,7 @@ jra_ts.add_name("JRA-55")
 era_monthly = read_era_interim()
 era_monthly.rebaseline(1981,2010)
 era_ts = era_monthly.annualise()
-era_ts.add_name("ERA-interim")
+era_ts.add_name("ERA-Interim")
 
 had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
@@ -35,6 +37,21 @@ giss_monthly = read_giss_monthly()
 giss_monthly.rebaseline(1981,2010)
 giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
+
+#berk_monthly = read_berkeley()
+#berk_monthly.rebaseline(1981,2010)
+#berk_ts = berk_monthly.annualise()
+#berk_ts.add_name("BerkeleyEarth")
+
+#cw_monthly = read_cowtan_and_way_monthly(cw_version)
+#cw_monthly.rebaseline(1981,2010)
+#cw_ts = cw_monthly.annualise()
+#cw_ts.add_name("Cowtan and Way")
+
+#mrlk = read_mrlk()
+#mrlk.rebaseline(1981,2010)
+#mrlk.add_name("MRLK")
+
 
 print "Difference in baseline 1981-2010 minus 1961-1990"
 hadclimshift= had_ts.calculate_average(1981,2010)-had_ts.calculate_average(1961,1990)
@@ -72,27 +89,35 @@ plt.figure(figsize=(16,9))
 #plt.fill_between([1781,2023],[preindus_low, preindus_low],[preindus_high, preindus_high],
 #                 facecolor="Powderblue",color="Powderblue", alpha=0.15,
 #                label='1 sigma range')
-plt.plot([1781,1859],[preindus_mid, preindus_mid],color="Powderblue")
-plt.plot([1904,2023],[preindus_mid, preindus_mid],color="Powderblue")
+if plotpre:
+    plt.plot([1781,1859],[preindus_mid, preindus_mid],color="Powderblue")
+    plt.plot([1904,2023],[preindus_mid, preindus_mid],color="Powderblue")
 #plt.plot([1781,2023],[preindus_low, preindus_low],color="Powderblue")
 #plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
 
+#mrlk.plot_ts_with_unc('silver','silver')
+#cw_ts.plot_ts('pink')
+#berk_ts.plot_ts('grey')
 jra_ts.plot_ts('mediumorchid')
 era_ts.plot_ts('forestgreen')
 had_ts.plot_ts('indianred')
 giss_ts.plot_ts('darkorange')
 ncdc_ts.plot_ts('steelblue')
 
+#mrlk.add_name("MRLK mean")
+#mrlk.plot_ts('black')
+
 fsz = 18
 
-plt.text(1861, 0.348, '~1$^\circ$C above pre-industrial', fontdict=hfont, fontsize=fsz, color="powderblue")
+if plotpre:
+    plt.text(1861, 0.348, '~1$^\circ$C above pre-industrial', fontdict=hfont, fontsize=fsz, color="powderblue")
 
 
 plt.xlabel('Year', fontsize=fsz, **hfont)
 plt.ylabel('Anomaly relative to 1981-2010 ($^\circ$C)', fontsize=fsz, **hfont)
 
 #plt.legend(loc='lower right', frameon=False)
-plt.legend(bbox_to_anchor=(0.89, 0.32),
+plt.legend(bbox_to_anchor=(0.89, 0.42),
            bbox_transform=plt.gcf().transFigure, 
            frameon=False)
 
@@ -110,11 +135,25 @@ plt.title('Global temperature anomaly 1850-2017 relative to 1981-2010', loc='lef
 plt.savefig('Figures/gmt.png', bbox_inches='tight')
 #plt.show()
 
-jra_ts.print_ordered_ts(5)
-era_ts.print_ordered_ts(5)
-had_ts.print_ordered_ts(5)
-ncdc_ts.print_ordered_ts(5)
-giss_ts.print_ordered_ts(5)
+jra_ts.print_ordered_ts(10)
+era_ts.print_ordered_ts(10)
+had_ts.print_ordered_ts(10)
+ncdc_ts.print_ordered_ts(10)
+giss_ts.print_ordered_ts(10)
+
+for y in range(1998,2018):
+
+    av = (had_ts.get_value(y) +
+          jra_ts.get_value(y) +
+          era_ts.get_value(y) +
+          ncdc_ts.get_value(y) +
+          giss_ts.get_value(y))/5.
+    print y,av, np.std([had_ts.get_value(y),
+                        jra_ts.get_value(y),
+                        era_ts.get_value(y),
+                        ncdc_ts.get_value(y),
+                        giss_ts.get_value(y)]) * 1.96
+    
 
 av = (had_ts.get_value(2017) +
       jra_ts.get_value(2017) +

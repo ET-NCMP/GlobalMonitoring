@@ -425,8 +425,8 @@ class time_series:
                 l = self.times[i-w]
                 r = self.times[i-1]
                 d = np.mean(self.data[i-w:i])
-                col = 'Coral'
-                if d < 0: col = 'DodgerBlue'
+                col = 'Grey'#'Coral'
+                if d < 0: col = 'Grey'#'DodgerBlue'
                 poly = Polygon(zip([l,r,r,l],
                                [0,0,d,d]),facecolor=col,
                                edgecolor="Black",zorder=2,
@@ -436,20 +436,20 @@ class time_series:
             
                 
 
-        plt.plot([1875,2020],[0,0],color='Black')
-        plt.xlabel('Year', fontsize=18)
-        plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
-        plt.axis((1875,2020,-0.62,0.62))
+        plt.plot([1845,2020],[0,0],color='Black')
+#        plt.xlabel('Year', fontsize=18)
+#        plt.ylabel('Anomaly relative to 1961-1990 (K)', fontsize=18)
+#        plt.axis((1875,2020,-0.62,0.62))
         #plt.axis((1880,2015.5,-0.62,0.62))
-        plt.show()
+#        plt.show()
     
-    def plot_ts(self, color):
-        plt.plot(self.times, self.data, linewidth=1.5, color=color, label=self.name)
+    def plot_ts(self, color, alpha=1.0):
+        plt.plot(self.times, self.data, linewidth=1.5, color=color, label=self.name, alpha=alpha)
 
     def plot_ts_with_unc(self, colora, colorbk):
         plt.plot(self.times, self.data, linewidth=1.5, color=colora, label=self.name)
         plt.fill_between(self.times, self.lounc, self.hiunc,
-                facecolor=colorbk,color=colorbk, alpha=1.00,
+                facecolor=colorbk,color=colorbk, alpha=0.53,
                 label='1 sigma range')
 
         mx = max(self.hiunc)
@@ -482,8 +482,9 @@ class time_series:
             elif nino_year(y) == 1:
                 color = "darkred"
 
-            if y == 2015:
-                color = "indianred"
+#            if y == 2015:
+#                color = "Silver"
+                #color = "indianred"
 
             delta = 0.45
            
@@ -511,13 +512,28 @@ class time_series:
         plt.savefig('Figures/gmt_skyscraper.png', bbox_inches='tight')
 
 
-def nino_year(year):
+def nino_year_old(year):
     #based on CPC Nino 3.4. Apparently.
 
     result = 0 #neutral
 
     elninos = [1958, 1966, 1973, 1983, 1987, 1988, 1998, 2003, 2010, 2015, 2016]
     laninas = [1950, 1955, 1956, 1974, 1976, 1989, 1999, 2000, 2008, 2011]
+
+    if year in laninas:
+        result = -1
+    elif year in elninos:
+        result = 1
+
+    return result
+ 
+def nino_year(year):
+    #based on CPC Nino 3.4. Apparently.
+
+    result = 0 #neutral
+
+    elninos = [1952, 1954, 1958, 1959, 1964, 1966, 1969, 1970, 1973, 1977, 1978, 1980, 1983, 1987, 1988, 1992, 1995, 1998, 2003, 2005, 2007, 2010, 2015, 2016]
+    laninas = [1950, 1955, 1956, 1965, 1971, 1972, 1974, 1975, 1976, 1984, 1985, 1989, 1996, 1999, 2000, 2001, 2006, 2008, 2009, 2011,2012]
 
     if year in laninas:
         result = -1
