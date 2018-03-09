@@ -3,6 +3,74 @@ import struct
 from time_series import *
 import csv
 
+
+def read_co2():
+
+    timeax  = []
+    data = []
+
+#https://www.esrl.noaa.gov/gmd/ccgg/trends/full.html
+    with open('Data/co2_mm_mlo.txt','rb') as infile:
+        for i in range(1,73):
+            infile.readline()
+        for line in infile:
+            columns = line.split()
+            timeax.append(float(columns[2]))
+            co2 = float(columns[3])
+            if co2 == -99.99:
+                co2  = None
+            data.append(co2)
+
+    return timeax,data
+
+def read_ohc():
+
+    timeax = []
+    anoms = []
+    lower_unc = []
+    upper_unc = []
+
+#https://data.nodc.noaa.gov/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-700m.dat
+    with open('Data/h22-w0-700m.dat', 'rb') as infile:
+        infile.readline()
+        for line in infile:
+            columns = line.split()
+            timeax.append(float(columns[0])-0.5)
+            anoms.append(float(columns[1]))
+            lower_unc.append(float(columns[1])-2*float(columns[2]))
+            upper_unc.append(float(columns[1])+2*float(columns[2]))
+
+    ts = time_series(timeax,
+                     anoms,
+                     lower_unc,
+                     upper_unc)
+
+    return ts
+
+def read_mohc_ohc():
+
+    timeax = []
+    anoms = []
+    lower_unc = []
+    upper_unc = []
+
+#from Rachel Killick
+    with open('Data/MOHC-TimeSeries-700m_19502017_.txt', 'rb') as infile:
+        infile.readline()
+        for line in infile:
+            columns = line.split()
+            timeax.append(float(columns[0]))
+            anoms.append(float(columns[1])/1E22)
+            lower_unc.append((float(columns[1])-2*float(columns[2]))/1E22)
+            upper_unc.append((float(columns[1])+2*float(columns[2]))/1E22)
+
+        ts = time_series(timeax,
+                         anoms,
+                         lower_unc,
+                         upper_unc)
+
+    return ts
+
 def read_noaa_continents(continent):
 
     years = []
@@ -41,6 +109,26 @@ def read_sea_level():
         columns = line.split()
         timeax.append(float(columns[2]))
         sealevel.append(float(columns[11]))
+
+    f.close()
+
+    return timeax, sealevel
+
+def read_CSIRO_sea_level():
+
+    f = open('Data/CSIRO_Alt.csv' ,'r')
+
+    f.readline()
+
+    timeax = []
+    sealevel = []
+
+    for line in f:
+        line = line.strip()
+        columns = line.split(',')
+
+        timeax.append(float(columns[0]))
+        sealevel.append(float(columns[1]))
 
     f.close()
 
@@ -198,7 +286,7 @@ def read_jra55():
     
 
 def read_era_interim():
-    f=open("Data/Data_for_month_10_2017_plot_3.txt",'r')
+    f=open("Data/ts_1month_anom_ei_T2_197901-201712.txt",'r')
 
     f.readline()
     f.readline()
@@ -459,6 +547,39 @@ def read_ncdc_format(filename):
                           ncdc_hiunc)
 
     return ncdc_ts
+
+
+def read_all(col):
+
+    years = []
+    months = []
+    anoms = []
+
+    with open('Data/all.csv', 'rb') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+
+        month = 1
+
+        count = 0
+        for row in reader:
+            count+=1
+            if count > 1:
+                if float(row[col]) > -90.0:
+                    years.append(int(float(row[0])))
+                    anoms.append(float(row[col]))
+                    months.append(month)
+
+                    month += 1
+                    if month == 13:
+                        month = 1
+            else:
+                print row[col]
+
+
+    ts = monthly_time_series(years,
+                             months,
+                             anoms)
+    return ts
 
 
 def read_ncdc(version):

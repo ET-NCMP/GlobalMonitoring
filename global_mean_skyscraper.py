@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 
 
-noaa_version = "v4.0.1.201710"
+noaa_version = "v4.0.1.201711"
 hadcrut_version = "4.6.0.0"
 
 
@@ -25,21 +25,27 @@ had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
 had_ts.rebaseline(1981,2010)
 
-ncdc_monthly = read_ncdc_monthly(noaa_version)
+ncdc_monthly = read_all(3)
+#ncdc_monthly = read_ncdc_monthly(noaa_version)
 ncdc_monthly.rebaseline(1981,2010)
 ncdc_ts = ncdc_monthly.annualise()
 ncdc_ts.add_name("NOAAGlobalTemp")
 
-giss_monthly = read_giss_monthly()
+giss_monthly = read_all(1)
+#giss_monthly = read_giss_monthly()
 giss_monthly.rebaseline(1981,2010)
 giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
 
 combined = had_ts.combine([jra_ts,era_ts,ncdc_ts,giss_ts])
 
+combined2 = had_ts.combine([ncdc_ts,giss_ts])
+
+
 combined.plot_skyscraper_diagram()
 
 combined.print_to_file_nounc('WMO_global_mean.csv')
+combined2.print_to_file_nounc('MO_global_mean.csv')
 
 assert False
 

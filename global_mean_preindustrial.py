@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 import matplotlib.patches as mpatches
 
-noaa_version = "v4.0.1.201710"
+noaa_version = "v4.0.1.201711"
 hadcrut_version = "4.6.0.0"
 
 
@@ -15,12 +15,14 @@ had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
 had_ts.rebaseline(1880,1900)
 
-ncdc_monthly = read_ncdc_monthly(noaa_version)
+ncdc_monthly = read_all(3)
+#ncdc_monthly = read_ncdc_monthly(noaa_version)
 ncdc_monthly.rebaseline(1880,1900)
 ncdc_ts = ncdc_monthly.annualise()
 ncdc_ts.add_name("NOAAGlobalTemp")
 
-giss_monthly = read_giss_monthly()
+giss_monthly = read_all(1)
+#giss_monthly = read_giss_monthly()
 giss_monthly.rebaseline(1880,1900)
 giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
@@ -43,6 +45,14 @@ era_monthly.rebaseline(1981,2010)
 era_ts = era_monthly.annualise()
 era_ts.add_name("ERA-Interim")
 era_ts.add_offset(avg_clim)
+
+
+jra_ts.print_to_file_nounc('JRA_global_mean_1880_1900.csv')
+era_ts.print_to_file_nounc('ERA_global_mean_1880_1900.csv')
+had_ts.print_to_file_nounc('HadCRUT_global_mean_1880_1900.csv')
+ncdc_ts.print_to_file_nounc('NOAAGlobalTemp_global_mean_1880_1900.csv')
+giss_ts.print_to_file_nounc('GISTEMP_global_mean_1880_1900.csv')
+
 
 print had_ts.get_value(2015) - had_ts.calculate_average(1880,1900)
 print had_ts.get_value(2016) - had_ts.calculate_average(1880,1900)

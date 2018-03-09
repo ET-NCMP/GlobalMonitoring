@@ -5,11 +5,11 @@ from time_series import *
 from read_data_sets import *
 
 
-noaa_version = "v4.0.1.201710"
+noaa_version = "v4.0.1.201711"
 hadcrut_version = "4.6.0.0"
 cw_version = "v2_0_0"
 
-plotpre = False
+plotpre = True
 
 print("GLOBAL AVERAGE TEMPERATURES")
 
@@ -17,7 +17,6 @@ jra_monthly = read_jra55()
 jra_monthly.rebaseline(1981,2010)
 jra_ts = jra_monthly.annualise()
 jra_ts.add_name("JRA-55")
-
 
 era_monthly = read_era_interim()
 era_monthly.rebaseline(1981,2010)
@@ -28,29 +27,37 @@ had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
 had_ts.rebaseline(1981,2010)
 
-ncdc_monthly = read_ncdc_monthly(noaa_version)
+ncdc_monthly = read_all(3)
+#ncdc_monthly = read_ncdc_monthly(noaa_version)
 ncdc_monthly.rebaseline(1981,2010)
 ncdc_ts = ncdc_monthly.annualise()
 ncdc_ts.add_name("NOAAGlobalTemp")
 
-giss_monthly = read_giss_monthly()
+giss_monthly = read_all(1)
+#giss_monthly = read_giss_monthly()
 giss_monthly.rebaseline(1981,2010)
 giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
 
-#berk_monthly = read_berkeley()
-#berk_monthly.rebaseline(1981,2010)
-#berk_ts = berk_monthly.annualise()
-#berk_ts.add_name("BerkeleyEarth")
+berk_monthly = read_berkeley()
+berk_monthly.rebaseline(1981,2010)
+berk_ts = berk_monthly.annualise()
+berk_ts.add_name("BerkeleyEarth")
 
-#cw_monthly = read_cowtan_and_way_monthly(cw_version)
-#cw_monthly.rebaseline(1981,2010)
-#cw_ts = cw_monthly.annualise()
-#cw_ts.add_name("Cowtan and Way")
+cw_monthly = read_cowtan_and_way_monthly(cw_version)
+cw_monthly.rebaseline(1981,2010)
+cw_ts = cw_monthly.annualise()
+cw_ts.add_name("Cowtan and Way")
 
 #mrlk = read_mrlk()
 #mrlk.rebaseline(1981,2010)
 #mrlk.add_name("MRLK")
+
+jra_ts.print_to_file_nounc('JRA_global_mean_1981_2010.csv')
+era_ts.print_to_file_nounc('ERA_global_mean_1981_2010.csv')
+had_ts.print_to_file_nounc('HadCRUT_global_mean_1981_2010.csv')
+ncdc_ts.print_to_file_nounc('NOAAGlobalTemp_global_mean_1981_2010.csv')
+giss_ts.print_to_file_nounc('GISTEMP_global_mean_1981_2010.csv')
 
 
 print "Difference in baseline 1981-2010 minus 1961-1990"
@@ -96,8 +103,8 @@ if plotpre:
 #plt.plot([1781,2023],[preindus_high, preindus_high],color="Powderblue")
 
 #mrlk.plot_ts_with_unc('silver','silver')
-#cw_ts.plot_ts('pink')
-#berk_ts.plot_ts('grey')
+cw_ts.plot_ts('pink')
+berk_ts.plot_ts('grey')
 jra_ts.plot_ts('mediumorchid')
 era_ts.plot_ts('forestgreen')
 had_ts.plot_ts('indianred')
@@ -117,7 +124,7 @@ plt.xlabel('Year', fontsize=fsz, **hfont)
 plt.ylabel('Anomaly relative to 1981-2010 ($^\circ$C)', fontsize=fsz, **hfont)
 
 #plt.legend(loc='lower right', frameon=False)
-plt.legend(bbox_to_anchor=(0.89, 0.42),
+plt.legend(bbox_to_anchor=(0.89, 0.38),
            bbox_transform=plt.gcf().transFigure, 
            frameon=False)
 
