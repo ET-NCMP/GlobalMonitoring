@@ -5,27 +5,33 @@ from time_series import *
 from read_data_sets import *
 import matplotlib.patches as mpatches
 
-noaa_version = "v4.0.1.201711"
+noaa_version = "v4.0.1.201712"
 hadcrut_version = "4.6.0.0"
 
+clim1=1850
+clim2=1900
 
 print("GLOBAL AVERAGE TEMPERATURES")
 
 had_ts = read_hadcrut4(hadcrut_version)
 had_ts.add_name("HadCRUT."+hadcrut_version)
-had_ts.rebaseline(1880,1900)
+had_ts.rebaseline(clim1,clim2)
 
-ncdc_monthly = read_all(3)
-#ncdc_monthly = read_ncdc_monthly(noaa_version)
+had_early_mean = had_ts.calculate_average(1880,1900)
+
+#ncdc_monthly = read_all(3)
+ncdc_monthly = read_ncdc_monthly(noaa_version)
 ncdc_monthly.rebaseline(1880,1900)
 ncdc_ts = ncdc_monthly.annualise()
 ncdc_ts.add_name("NOAAGlobalTemp")
+ncdc_ts.add_offset(had_early_mean)
 
-giss_monthly = read_all(1)
-#giss_monthly = read_giss_monthly()
+#giss_monthly = read_all(1)
+giss_monthly = read_giss_monthly()
 giss_monthly.rebaseline(1880,1900)
 giss_ts = giss_monthly.annualise()
 giss_ts.add_name("GISTEMP")
+giss_ts.add_offset(had_early_mean)
 
 had_mean = had_ts.calculate_average(1981,2010)
 ncdc_mean = ncdc_ts.calculate_average(1981,2010)
@@ -38,7 +44,6 @@ jra_monthly.rebaseline(1981,2010)
 jra_ts = jra_monthly.annualise()
 jra_ts.add_name("JRA-55")
 jra_ts.add_offset(avg_clim)
-
 
 era_monthly = read_era_interim()
 era_monthly.rebaseline(1981,2010)
@@ -71,7 +76,7 @@ ncdc_ts.plot_ts('steelblue')
 fsz = 18
 
 plt.xlabel('Year', fontsize=fsz, **hfont)
-plt.ylabel('Anomaly relative to 1880-1900 ($^\circ$C)', fontsize=fsz, **hfont)
+plt.ylabel('Anomaly relative to 1850-1900 ($^\circ$C)', fontsize=fsz, **hfont)
 
 #plt.legend(loc='upper left', frameon=False)
 plt.legend(bbox_to_anchor=(0.3, 0.87),
@@ -89,7 +94,8 @@ ax1.xaxis.set_ticks_position('bottom')
 
 plt.title('Global temperature anomaly 1850-2017 relative to pre-industrial', loc='left', fontsize = fsz+10, **hfont)
 
-plt.savefig('Figures/gmt_pre.png', bbox_inches='tight')
+#plt.savefig('Figures/gmt_pre.png', bbox_inches='tight')
+plt.savefig('Figures/gmt_pre.eps', bbox_inches='tight')
 #plt.show()
 
 jra_ts.print_ordered_ts(5)

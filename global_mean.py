@@ -5,7 +5,7 @@ from time_series import *
 from read_data_sets import *
 
 
-noaa_version = "v4.0.1.201711"
+noaa_version = "v4.0.1.201712"
 hadcrut_version = "4.6.0.0"
 cw_version = "v2_0_0"
 
